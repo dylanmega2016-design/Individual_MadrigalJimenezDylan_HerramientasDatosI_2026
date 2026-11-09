@@ -1,0 +1,68 @@
+
+---
+lang: es
+format:
+  pdf:
+    fontsize: 12pt
+    geometry:
+      - margin=2.5cm
+    number-sections: false
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{=latex}
+\begingroup
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+\textbf{Universidad de Costa Rica}\par
+Escuela de Matemática\par
+CA-0204 --- Herramientas de Ciencia de Datos I\par
+II ciclo, 2026\par
+
+\vspace{0.25cm}
+
+{\large\textbf{El cerebro vs las emociones}}\par
+Análisis de respuestas emocionales y actividad EEG en GAMEEMO\par
+
+\vspace{0.25cm}
+
+Dylan Madrigal Jiménez\par
+
+\vspace{0.25cm}
+
+9 de noviembre de 2026\par
+
+\vspace{0.35cm}
+\hrule
+\endgroup
+```
+
+## Introducción 
+
+Los videojuegos ofrecen experiencias que pueden generar distintas respuestas emocionales, desde miedo e incomodidad hasta tranquilidad y diversión. Sin embargo, las emociones que experimenta una persona no necesariamente se reflejan de manera directa en un único indicador de actividad cerebral. Mediante el electroencefalograma (EEG) es posible estudiar las oscilaciones eléctricas registradas en el cuero cabelludo, cuyas bandas de frecuencia alfa y beta se han relacionado con diversos procesos atencionales, cognitivos y sensoriomotores (Klimesch, 2012; Engel y Fries, 2010).
+
+Esta investigación utiliza el conjunto de datos GAMEEMO, desarrollado por Alakuş et al. (2020), que contiene registros EEG y evaluaciones emocionales de 28 participantes durante cuatro videojuegos. A partir de las respuestas del cuestionario Self-Assessment Manikin (SAM) y del análisis de las potencias espectrales alfa y beta, se busca explorar la relación entre las emociones declaradas y las características de las señales EEG, con especial atención al contraste entre los dos siguientes videojuegos: *Slender: The arrival* y *Goat Simulator*.
+
+## Objetivo 
+
+Analizar la relación entre las respuestas emocionales registradas mediante los cuestionarios SAM y las potencias espectrales alfa y beta obtenidas de las señales EEG durante cuatro videojuegos, con especial énfasis en las diferencias entre *Slender: The Arrival* y *Goat Simulator*.
+
+## Metodología
+
+Se realizó un análisis exploratorio y descriptivo utilizando la base de datos GAMEEMO, desarrollada por Alakuş et al. (2020). Esta contiene registros electroencefalográficos (EEG) de 28 participantes durante cuatro videojuegos: *Train Sim World* (G1), *Unravel* (G2), *Slender: The Arrival* (G3) y *Goat Simulator* (G4). Cada participante jugó durante aproximadamente cinco minutos y evaluó su experiencia emocional mediante el cuestionario *Self-Assessment Manikin* (SAM), que registra la valencia (agrado o desagrado) y la activación emocional.
+
+El procesamiento se realizó en R utilizando los paquetes *tidyverse*, *readxl* y *gsignal*. Se organizaron las respuestas SAM y se importaron los 112 archivos EEG, compuestos por mediciones de 14 electrodos registradas a una frecuencia de 128 muestras por segundo. Se revisó la presencia de valores faltantes y se eliminaron las columnas vacías.
+
+Los registros EEG se obtuvieron directamente del repositorio GAMEEMO, utilizando los archivos CSV preprocesados proporcionados por sus autores. Estos contienen una serie temporal para cada electrodo: cada fila representa una medición tomada en un instante determinado. Sin embargo, estos valores no indican directamente cuánta actividad alfa o beta existe, pues la señal registrada combina componentes que oscilan a distintas frecuencias. Por ello, fue necesario transformar los datos para analizar su distribución de potencia.
+
+Para este propósito se utilizó el método de Welch (1967), descrito en el contexto neurocientífico por Zhang et al. (2023, p. 9). Este procedimiento divide una señal en segmentos y aplica la transformada de Fourier a cada uno para estimar la potencia correspondiente a distintas frecuencias. Posteriormente, promedia los espectros obtenidos. Se seleccionó este método porque dicho promedio reduce la variabilidad de la estimación y permite obtener resultados menos sensibles a fluctuaciones aleatorias que una estimación realizada sobre toda la señal mediante una única transformada de Fourier (Zhang et al., 2023, p. 31).
+
+En R se utilizó la función `pwelch()` del paquete *gsignal* para estimar la densidad espectral de potencia. Esta función se configuró para dividir las señales de cada electrodo en segmentos de 256 muestras, es decir, 256 registros consecutivos del archivo CSV, equivalentes a dos segundos de medición. Se empleó una ventana Hamming, que reduce el peso de los valores cercanos a los extremos de cada segmento para disminuir las distorsiones asociadas con cortes bruscos. Además, se estableció un solapamiento del 50 %, de modo que cada segmento comparte 128 muestras con el siguiente. Finalmente, se utilizó una transformada rápida de Fourier de 256 puntos para estimar la distribución de potencia por frecuencia, cuyos resultados se promediaron mediante el método de Welch.
+
+Una vez estimada la densidad espectral de potencia, se calcularon las potencias alfa (8–12 Hz) y beta (12–30 Hz). Estas bandas se seleccionaron por su relevancia en estudios de atención, procesamiento de información y procesos cognitivos y sensoriomotores (Klimesch, 2012; Engel & Fries, 2010). Para obtener un único valor por banda se utilizó la regla del trapecio, que aproxima el área bajo la curva espectral dentro del intervalo de frecuencias correspondiente. Así, los múltiples valores de potencia estimados por Welch se resumieron en una potencia total para cada banda y electrodo.
+
+Finalmente, se seleccionaron ocho electrodos frontales y frontocentrales (AF3, AF4, F3, F4, F7, F8, FC5 y FC6), debido al interés de estas posiciones en investigaciones sobre procesamiento emocional y motivación (Smith et al., 2017). Para cada participante y videojuego se calculó la mediana de las potencias de estos ocho canales, en lugar de la media aritmética, con el propósito de reducir la influencia de valores extremos. Estos resultados se relacionaron con las respuestas SAM para comparar los cuatro videojuegos y analizar las diferencias individuales entre *Slender* y *Goat Simulator*.
