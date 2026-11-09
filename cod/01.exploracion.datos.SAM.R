@@ -34,7 +34,62 @@ resumen.activacion <- comparacion.activacion %>%
     mayor.goat = sum(diferencia.activacion > 0),
     mayor.slender = sum(diferencia.activacion < 0),
     iguales = sum(diferencia.activacion == 0),
-    mediana.diferencia = median(diferencia.activacion)
+    mediana.diferencia = median(diferencia.activacion) 
   )
 
-resumen.activacion
+# Gráfico de la valencia emocional de los cuatro videojuegos
+
+# Gráfico 1: Distribución de la valencia emocional
+
+ggplot(datos_sam, aes(x = juego, y = valencia_SAM)) +
+  geom_boxplot(
+    aes(fill = juego),
+    width = 0.55,
+    colour = "grey30",
+    outlier.shape = NA
+  ) +
+  geom_jitter(
+    width = 0.12,
+    height = 0,
+    size = 1.6,
+    alpha = 0.4,
+    colour = "grey25"
+  ) +
+  scale_fill_manual(
+    values = c(
+      G1 = "grey85",
+      G2 = "grey85",
+      G3 = "grey85",
+      G4 = "#168F77"
+    ),
+    guide = "none"
+  ) +
+  scale_x_discrete(
+    labels = c(
+      G1 = "Train Sim World\n(G1)",
+      G2 = "Unravel\n(G2)",
+      G3 = "Slender\n(G3)",
+      G4 = "Goat Simulator\n(G4)"
+    )
+  ) +
+  scale_y_continuous(
+    breaks = c(1, 3, 5, 7, 9),
+    limits = c(1, 9)
+  ) +
+  labs(
+    title = "Goat Simulator fue calificado como más agradable que Slender",
+    subtitle = "Mediana de valencia: 7 frente a 3 puntos; 28 participantes por juego",
+    x = NULL,
+    y = "Valencia SAM (1 = desagradable; 9 = agradable)",
+    caption = "Fuente: elaboración propia con GAMEEMO (Alakuş et al., 2020). Sin datos faltantes."
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold", size = 15),
+    plot.title.position = "plot",
+    plot.subtitle = element_text(size = 11, colour = "grey35"),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(size = 10),
+    plot.caption = element_text(size = 9, colour = "grey40", hjust = 0)
+  )
