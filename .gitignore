@@ -1,5 +1,9 @@
+# Archivos locales y temporales de RStudio
 .Rproj.user/
 .Rhistory
 .RData
+.RDataTmp
 .Ruserdata
-data/S*/ 
+
+# Datos EEG de GAMEEMO
+data/datos jugadores EEG/
