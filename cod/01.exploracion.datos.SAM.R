@@ -1,37 +1,65 @@
-library (tidyverse)
-library (readxl)
-library(ggdist)
-library(ggbeeswarm)
-datos_sam <- read_excel("data/datos.SAM/GAMEEMO_respuestas_SAM_revision.xlsx", sheet = "Datos_SAM") ##traemos los datos del excel del SAM
-resumen_sam <- datos_sam %>% 
-  group_by (juego) %>% 
-  summarise (mediana.valencia = median(valencia_SAM), mediana.activacion = median(activacion_SAM), participantes = n())
-##valencia es que tan agradable es el juego, mientras que activacion es que tan estimulante es el juego  
-
-comparacion_sam <- datos_sam %>% 
-  filter(juego == "G3" | juego == "G4") %>% 
-  select(participante, juego, valencia_SAM)
-
-
-comparacion_sam <- comparacion_sam %>% 
-  pivot_wider (names_from =juego, values_from= valencia_SAM) %>% 
-  mutate(diferencia_valencia = G4-G3) ##Para ver cuantos puntos de diferencia de agrado tienen ambos juegos por jugador
-
-resumen.comparacion <- comparacion_sam %>%
-  summarise( mayor.goat = sum(diferencia_valencia > 0), mayor.slender = sum(diferencia_valencia < 0), iguales = sum(diferencia_valencia == 0),
-   mediana.diferencia = median(diferencia_valencia))
+# -------------------------------------------------------------------------
+# Proyecto individual - Herramientas de Ciencia de Datos I
+# Script 01: Exploración de datos SAM
+#
+# Objetivo: analizar la valencia y activación emocional reportadas
+# durante los cuatro videojuegos.
+#
+# Los participantes calificaron del 1 al 9 el agrado (valencia)
+# y la intensidad emocional (activación) de cada videojuego.
+#
+# Fuente de datos: GAMEEMO (Alakuş et al., 2020).
+# -------------------------------------------------------------------------
 
 
-comparacion.activacion <- datos_sam %>%
-  filter(juego == "G3" | juego == "G4") %>%
-  select(participante, juego, activacion_SAM) %>%
+# Librerías necesarias
+library(tidyverse)
+library(readxl)
+
+# Importamos las respuestas del cuestionario SAM
+datos.sam <- read_excel(
+  "data/datos.SAM/GAMEEMO_respuestas_SAM_revision.xlsx", 
+  sheet = "Datos_SAM") 
+
+# Resumen de valencia y activación por videojuego
+resumen.sam <- datos.sam |> 
+  group_by(juego) |> 
+  summarise(
+    mediana.valencia = median(valencia_SAM),
+    mediana.activacion = median(activacion_SAM),
+    participantes = n()
+            )
+
+# Comparación de valencia entre Slender (G3) y Goat Simulator (G4)
+comparacion.sam <- datos.sam |> 
+  filter(juego == "G3" | juego == "G4") |> 
+  select(participante, juego, valencia_SAM)|> 
+  pivot_wider (
+    names_from = juego,
+    values_from = valencia_SAM
+    ) |> 
+  mutate(diferencia.valencia = G4-G3) 
+
+# Resumen de las diferencias de valencia entre ambos juegos
+resumen.comparacion <- comparacion.sam |>
+  summarise( 
+    mayor.goat = sum(diferencia.valencia > 0), 
+    mayor.slender = sum(diferencia.valencia < 0), 
+    iguales = sum(diferencia.valencia == 0), 
+    mediana.diferencia = median(diferencia.valencia))
+
+# Comparación de activación entre Slender (G3) y Goat Simulator (G4)
+comparacion.activacion <- datos.sam |>
+  filter(juego == "G3" | juego == "G4") |>
+  select(participante, juego, activacion_SAM) |>
   pivot_wider(
     names_from = juego,
     values_from = activacion_SAM
-  ) %>%
-  mutate(diferencia.activacion = G4 - G3) ##Para ver cuantos puntos de diferencia de intensidad tienen ambos juegos por jugador
+  ) |>
+  mutate(diferencia.activacion = G4 - G3)
 
-resumen.activacion <- comparacion.activacion %>%
+# Resumen de las diferencias de activación entre ambos juegos
+resumen.activacion <- comparacion.activacion |>
   summarise(
     mayor.goat = sum(diferencia.activacion > 0),
     mayor.slender = sum(diferencia.activacion < 0),
@@ -39,218 +67,21 @@ resumen.activacion <- comparacion.activacion %>%
     mediana.diferencia = median(diferencia.activacion) 
   )
 
+# -------------------------------------------------------------------------
+# Preparación de datos para la visualización SAM
+# -------------------------------------------------------------------------
 
-## Gráfico 1: Distribución de la valencia emocional
-
-ggplot(datos_sam, aes(x = juego, y = valencia_SAM)) +
-  geom_boxplot(
-    aes(fill = juego),
-    width = 0.55,
-    colour = "grey30",
-    outlier.shape = NA
-  ) +
-  geom_jitter(
-    width = 0.12,
-    height = 0,
-    size = 1.6,
-    alpha = 0.4,
-    colour = "grey25"
-  ) +
-  scale_fill_manual(
-    values = c(
-      G1 = "grey85",
-      G2 = "grey85",
-      G3 = "grey85",
-      G4 = "#168F77"
-    ),
-    guide = "none"
-  ) +
-  scale_x_discrete(
-    labels = c(
-      G1 = "Train Sim World\n(G1)",
-      G2 = "Unravel\n(G2)",
-      G3 = "Slender\n(G3)",
-      G4 = "Goat Simulator\n(G4)"
-    )
-  ) +
-  scale_y_continuous(
-    breaks = c(1, 3, 5, 7, 9),
-    limits = c(1, 9)
-  ) +
-  labs(
-    title = "Goat Simulator fue calificado como más agradable que Slender",
-    subtitle = "Mediana de valencia: 7 frente a 3 puntos; 28 participantes por juego",
-    x = NULL,
-    y = "Valencia SAM (1 = desagradable; 9 = agradable)",
-    caption = "Fuente: elaboración propia con GAMEEMO (Alakuş et al., 2020). Sin datos faltantes."
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    plot.title = element_text(face = "bold", size = 15),
-    plot.title.position = "plot",
-    plot.subtitle = element_text(size = 11, colour = "grey35"),
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor = element_blank(),
-    axis.text.x = element_text(size = 10),
-    plot.caption = element_text(size = 9, colour = "grey40", hjust = 0)
-  )
-ggsave(
-  "res/01_valencia_videojuegos.png", ##Guardamos el primer grafico
-  width = 9,
-  height = 5.5,
-  dpi = 300,
-  bg = "white"
-)
-# Gráfico 2: Activación emocional durante los videojuegos
-
-grafico.activacion <- ggplot(
-  datos_sam,
-  aes(x = juego, y = activacion_SAM, fill = juego)
-) +
-  geom_boxplot(
-    width = 0.55,
-    colour = "grey30",
-    outlier.shape = NA
-  ) +
-  geom_jitter(
-    width = 0.12,
-    height = 0,
-    size = 1.6,
-    alpha = 0.4,
-    colour = "grey25"
-  ) +
-  scale_fill_manual(
-    values = c(
-      G1 = "grey85",
-      G2 = "grey85",
-      G3 = "#A45A5A",
-      G4 = "#168F77"
-    ),
-    guide = "none"
-  ) +
-  scale_x_discrete(
-    labels = c(
-      G1 = "Train Sim World\n(G1)",
-      G2 = "Unravel\n(G2)",
-      G3 = "Slender\n(G3)",
-      G4 = "Goat Simulator\n(G4)"
-    )
-  ) +
-  scale_y_continuous(
-    breaks = c(1, 3, 5, 7, 9),
-    limits = c(1, 9)
-  ) +
-  labs(
-    title = "El terror y la diversión registraron mayor activación emocional",
-    subtitle = "Medianas: Slender 6,5 y Goat Simulator 6; 28 participantes por juego",
-    x = NULL,
-    y = "Activación SAM (1 = baja; 9 = alta)",
-    caption = "Fuente: elaboración propia con GAMEEMO (Alakuş et al., 2020)."
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    plot.title = element_text(face = "bold", size = 15),
-    plot.title.position = "plot",
-    plot.subtitle = element_text(size = 11, colour = "grey35"),
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor = element_blank(),
-    axis.text.x = element_text(size = 10),
-    plot.caption = element_text(size = 9, colour = "grey40", hjust = 0)
-  )
-
-ggsave(
-  filename = "res/02_activacion_videojuegos.png", ##Guardamos el segundo gráfico 
-  plot = grafico.activacion,
-  width = 9,
-  height = 5.5,
-  dpi = 300,
-  bg = "white"
-)
-
-datos_grafico <- datos_sam %>%
+# Transformamos los datos SAM a formato largo
+datos.grafico <- datos.sam |>
   pivot_longer(
     cols = c(valencia_SAM, activacion_SAM),
     names_to = "dimension",
     values_to = "puntuacion"
   )
 
-head(datos_grafico)
-## Comparamos valencia y activación
-
-grafico.sam <- ggplot(
-  datos_grafico,
-  aes(x = juego, y = puntuacion, fill = juego)
-) +
-  geom_boxplot(
-    width = 0.55,
-    outlier.shape = NA
-  ) +
-    geom_jitter(
-      width = 0.12,
-      height = 0,
-      alpha = 0.35,
-      size = 1.5
-    )+
-  facet_wrap(
-    ~ dimension,
-    nrow = 1,
-    labeller = as_labeller(c(
-      valencia_SAM = "Valencia (agrado)",
-      activacion_SAM = "Activación (intensidad)"
-    ))
-  ) +
-  scale_fill_manual(
-    values = c(
-      G1 = "grey80",
-      G2 = "grey80",
-      G3 = "#B65B5B",
-      G4 = "#168F77"
-    ),
-    guide = "none"
-  ) +
-  scale_y_continuous(
-    breaks = c(1, 3, 5, 7, 9),
-    limits = c(1, 9)
-  ) +
-  labs(
-    title = "Slender y Goat difieren más en agrado que en activación",
-    subtitle = "Medianas de valencia: 3 y 7; de activación: 6,5 y 6",
-    x = "Videojuego",
-    y = "Puntuación SAM (1 a 9)",
-    caption = "Fuente: elaboración propia con GAMEEMO (Alakuş et al., 2020)."
-  ) +
-  theme_minimal(base_size = 12) +
-  theme(
-    plot.title = element_text(face = "bold", size = 14),
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor = element_blank(),
-    strip.text = element_text(face = "bold"),
-    plot.caption = element_text(hjust = 0)
-  )
-ggsave(
-  "res/03_resumen_sam.png",
-  plot = grafico.sam,
-  width = 9,
-  height = 4.5,
-  dpi = 300,
-  bg = "white"
-)
-
-#Primer grafico de resultados
-
-## Gráfico SAM: distribución de valencia y activación
-
-
-## Gráfico SAM: mapa de burbujas pastel
-## Las burbujas correspondientes a las medianas
-## se destacan con colores más intensos.
-
-library(tidyverse)
-
-# 1. Preparamos los datos del cuestionario SAM
-datos.bolitas <- datos_grafico %>%
-  dplyr::filter(!is.na(puntuacion)) %>%
-  dplyr::mutate(
+datos.bolitas <- datos.grafico |>
+  filter(!is.na(puntuacion)) |>
+  mutate(
     juego = factor(
       juego,
       levels = c("G4", "G3", "G2", "G1"),
@@ -271,90 +102,85 @@ datos.bolitas <- datos_grafico %>%
     )
   )
 
-# 2. Contamos cuántos participantes eligieron cada puntuación
-conteos.sam <- datos.bolitas %>%
-  dplyr::count(
+conteos.sam <- datos.bolitas |>
+  count(
     dimension,
     juego,
     puntuacion,
     name = "participantes"
-  ) %>%
-  dplyr::filter(participantes > 0)
+  ) 
 
-# 3. Calculamos las medianas de cada videojuego
-medianas.sam <- datos.bolitas %>%
-  dplyr::group_by(dimension, juego) %>%
-  dplyr::summarise(
+medianas.sam <- datos.bolitas |>
+  group_by(dimension, juego) |>
+  summarise(
     mediana = median(puntuacion),
     .groups = "drop"
-  ) %>%
-  dplyr::mutate(
-    etiqueta = dplyr::if_else(
+  ) |>
+  mutate(
+    etiqueta = if_else(
       mediana %% 1 == 0,
       as.character(as.integer(mediana)),
       sub("\\.", ",", as.character(mediana))
     )
   )
 
-# 4. Identificamos las burbujas que coinciden con la mediana
-# Conservamos el conteo de participantes y su tamaño.
-conteos.sam <- conteos.sam %>%
-  dplyr::left_join(
-    medianas.sam %>%
-      dplyr::select(dimension, juego, mediana),
+conteos.sam <- conteos.sam |>
+  left_join(
+    medianas.sam |>
+      select(dimension, juego, mediana),
     by = c("dimension", "juego")
-  ) %>%
-  dplyr::mutate(
-    es.mediana = dplyr::near(puntuacion, mediana),
-    color.bolita = dplyr::if_else(
+  ) |>
+  mutate(
+    es.mediana = near(puntuacion, mediana),
+    color.bolita = if_else(
       es.mediana,
       paste0(as.character(juego), "_mediana"),
       as.character(juego)
     )
   )
 
-# 5. Identificamos las medianas decimales, como 6,5.
-# Estas no coinciden con una respuesta individual,
-# por lo que necesitan una bolita adicional.
-medianas.decimales <- medianas.sam %>%
-  dplyr::filter(mediana %% 1 != 0) %>%
-  dplyr::mutate(
+
+medianas.decimales <- medianas.sam |>
+  filter(mediana %% 1 != 0) |>
+  mutate(
     color.bolita = paste0(
       as.character(juego),
       "_mediana"
     )
   )
 
-# 6. Colores pastel originales y tonos intensos
+# -------------------------------------------------------------------------
+# Gráfico SAM: distribución de valencia y activación
+# -------------------------------------------------------------------------
+
+# Colores normales e intensos para las medianas
 colores.bolitas <- c(
+  # Colores pastel
   "Train Sim World" = "#B5C2D3",
   "Unravel" = "#C4B8D2",
   "Slender" = "#E48791",
   "Goat Simulator" = "#63B7A5",
   
-  "Train Sim World_mediana" = "#7085A8",
-  "Unravel_mediana" = "#9174B4",
-  "Slender_mediana" = "#C54E62",
-  "Goat Simulator_mediana" = "#208B79"
+  # Colores de las medianas
+  "Train Sim World_mediana" = "#465C85",
+  "Unravel_mediana" = "#66468F",
+  "Slender_mediana" = "#AD3853",
+  "Goat Simulator_mediana" = "#126C5B"
 )
 
-# Colores para las etiquetas de las medianas
+
 colores.mediana <- c(
-  "Train Sim World" = "#7085A8",
-  "Unravel" = "#9174B4",
-  "Slender" = "#C54E62",
-  "Goat Simulator" = "#208B79"
+  "Train Sim World" = "#465C85",
+  "Unravel" = "#66468F",
+  "Slender" = "#AD3853",
+  "Goat Simulator" = "#126C5B"
 )
 
-# 7. Líneas de referencia de la escala SAM
-lineas.referencia <- tibble::tibble(
+lineas.referencia <- data.frame(
   puntuacion = 1:9
 )
-
-# 8. Construimos el gráfico
 grafico.sam.bolitas <- ggplot() +
   
-  # Líneas verticales tenues
   geom_vline(
     data = lineas.referencia,
     aes(xintercept = puntuacion),
@@ -362,8 +188,6 @@ grafico.sam.bolitas <- ggplot() +
     linewidth = 0.45
   ) +
   
-  # Burbujas originales, con su tamaño según el conteo.
-  # Las que corresponden a medianas tienen un tono intenso.
   geom_point(
     data = conteos.sam,
     aes(
@@ -374,13 +198,10 @@ grafico.sam.bolitas <- ggplot() +
     ),
     shape = 21,
     colour = "#FFFFFF",
-    stroke = 0.7,
-    alpha = 0.90
+    stroke = 0.55,
+    alpha = 0.94
   ) +
   
-  # Bolita adicional solamente para medianas decimales.
-  # Por ejemplo, la de Slender en activación se ubica
-  # exactamente en 6,5, entre las columnas 6 y 7.
   geom_point(
     data = medianas.decimales,
     aes(
@@ -390,14 +211,13 @@ grafico.sam.bolitas <- ggplot() +
     ),
     inherit.aes = FALSE,
     shape = 21,
-    size = 5,
+    size = 3.5,
     colour = "#FFFFFF",
-    stroke = 1,
+    stroke = 0.65,
     alpha = 1,
     show.legend = FALSE
   ) +
   
-  # Etiquetas de las medianas a la derecha
   geom_label(
     data = medianas.sam,
     aes(
@@ -416,39 +236,33 @@ grafico.sam.bolitas <- ggplot() +
     show.legend = FALSE
   ) +
   
-  # Paneles de valencia y activación
   facet_wrap(
     ~ dimension,
     ncol = 1
   ) +
   
-  # Escala de puntuación SAM
   scale_x_continuous(
     breaks = 1:9,
     limits = c(0.5, 11.15),
     expand = c(0, 0)
   ) +
   
-  # Mantenemos la escala de tamaños del gráfico anterior
   scale_size_area(
-    max_size = 19,
+    max_size = 13.5,
     breaks = c(1, 3, 5, 7),
     name = "Participantes"
   ) +
   
-  # Colores de las burbujas
   scale_fill_manual(
     values = colores.bolitas,
     guide = "none"
   ) +
   
-  # Colores de las etiquetas
   scale_colour_manual(
     values = colores.mediana,
     guide = "none"
   ) +
   
-  # Títulos
   labs(
     title = "Slender y Goat: distinto agrado, intensidad parecida",
     subtitle = paste(
@@ -464,7 +278,6 @@ grafico.sam.bolitas <- ggplot() +
     )
   ) +
   
-  # Diseño pastel original
   theme_minimal(base_size = 13) +
   
   theme(
@@ -508,7 +321,7 @@ grafico.sam.bolitas <- ggplot() +
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
     
-    panel.spacing = grid::unit(1.6, "lines"),
+    panel.spacing = grid::unit(1.8, "lines"),
     
     axis.text.y = element_text(
       size = 11,
@@ -563,21 +376,17 @@ grafico.sam.bolitas <- ggplot() +
       override.aes = list(
         fill = "#A6B3C5",
         colour = "#FFFFFF",
-        alpha = 0.90
+        alpha = 0.94
       )
     )
   )
 
-# 9. Mostrar el gráfico
-print(grafico.sam.bolitas)
-
-# 10. Guardarlo para Quarto
+# Guardamos el gráfico para el informe Quarto
 ggsave(
-  filename = "res/03_resumen_sam_bolitas.png",
+  filename = "res/01_resumen_sam_bolitas.png",
   plot = grafico.sam.bolitas,
-  width = 11,
-  height = 8,
+  width = 12.5,
+  height = 8.5,
   dpi = 300,
   bg = "white"
 )
-
