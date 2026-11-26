@@ -210,7 +210,6 @@ grafico.eeg.preprocesado <- ggplot(
     alpha = 0.9
   ) +
   
-  # Cada electrodo tendrá su propio panel
   facet_wrap(
     ~ electrodo,
     ncol = 1,
@@ -227,31 +226,22 @@ grafico.eeg.preprocesado <- ggplot(
   ) +
   
   labs(
-    title = "Así se registran las señales EEG preprocesadas",
-    subtitle = paste(
-      "Primer minuto de una grabación de GAMEEMO.",
-      "Cada electrodo registra 128 muestras por segundo."
-    ),
+    title = NULL,
+    subtitle = "Nota: Se muestra el primer minuto de una grabación de GAMEEMO. Cada electrodo registra 128 muestras por segundo.",
     x = "Tiempo (segundos)",
     y = "Amplitud registrada",
-    caption = paste(
-      "Datos: GAMEEMO (Alakuş et al., 2020).",
-      "Señales preprocesadas, antes del análisis Welch."
-    )
+    caption = NULL
   ) +
   
   theme_minimal(base_size = 12) +
   
   theme(
-    plot.title = element_text(
-      face = "bold",
-      size = 17,
-      colour = "#26354A"
-    ),
+    plot.title = element_blank(),
     
     plot.subtitle = element_text(
       size = 10.5,
-      colour = "#728097"
+      colour = "#728097",
+      margin = margin(b = 10)
     ),
     
     strip.text = element_text(
@@ -276,16 +266,16 @@ grafico.eeg.preprocesado <- ggplot(
       colour = "#64748B"
     ),
     
-    plot.caption = element_text(
-      size = 9,
-      colour = "#8490A2",
-      hjust = 0
+    axis.title = element_text(
+      colour = "#475569"
     ),
+    
+    plot.caption = element_blank(),
     
     panel.spacing = grid::unit(0.8, "lines")
   )
 
-#Guardamos el gráfico del primer minuto
+# Guardamos el gráfico del primer minuto
 ggsave(
   filename = "res/02_eeg_preprocesado_1_minuto.png",
   plot = grafico.eeg.preprocesado,
@@ -301,7 +291,6 @@ ggsave(
 # -------------------------------------------------------------------------
 
 # Conservamos el mismo gráfico, pero acercamos la vista a los primeros dos segundos.
-
 grafico.eeg.dos.segundos <- grafico.eeg.preprocesado +
   
   coord_cartesian(
@@ -313,12 +302,20 @@ grafico.eeg.dos.segundos <- grafico.eeg.preprocesado +
   ) +
   
   labs(
-    title = "Así se ve un segmento EEG de dos segundos",
-    subtitle = paste(
-      "Cada electrodo aporta 256 muestras.",
-      "Esta es la duración de las ventanas que usamos en Welch."
+    title = NULL,
+    subtitle = "Nota: Se muestra un segmento de 256 muestras consecutivas, equivalente a dos segundos de registro, que corresponde a la longitud de ventana utilizada en el método de Welch.",
+    x = "Tiempo (segundos)",
+    caption = NULL
+  ) +
+  
+  theme(
+    plot.title = element_blank(),
+    plot.subtitle = element_text(
+      size = 10.5,
+      colour = "#728097",
+      margin = margin(b = 10)
     ),
-    x = "Tiempo (segundos)"
+    plot.caption = element_blank()
   )
 
 # Guardamos la ampliación
@@ -367,21 +364,18 @@ grafico.psd <- ggplot(
   aes(x = frecuencia, y = densidad)
 ) +
   
-  # Área bajo la curva de la banda alfa
   geom_area(
     data = datos.alfa,
     fill = "#B5C2D3",
     alpha = 0.7
   ) +
   
-  # Área bajo la curva de la banda beta
   geom_area(
     data = datos.beta,
     fill = "#63B7A5",
     alpha = 0.5
   ) +
   
-  # Líneas verticales para visualizar los trapecios
   geom_segment(
     aes(
       xend = frecuencia,
@@ -393,19 +387,16 @@ grafico.psd <- ggplot(
     alpha = 0.8
   ) +
   
-  # Curva que conecta los valores de Welch
   geom_line(
     colour = "#465C85",
     linewidth = 1
   ) +
   
-  # Puntos de las frecuencias
   geom_point(
     colour = "#465C85",
     size = 2.2
   ) +
   
-  # Línea que separa alfa y beta
   geom_vline(
     xintercept = 12,
     linetype = "dashed",
@@ -413,7 +404,6 @@ grafico.psd <- ggplot(
     linewidth = 0.7
   ) +
   
-  # Nombres de las bandas
   annotate(
     "text",
     x = 10,
@@ -436,39 +426,24 @@ grafico.psd <- ggplot(
     colour = "#126C5B"
   ) +
   
-  # Mostramos únicamente de 8 a 30 Hz
   scale_x_continuous(
     limits = c(8, 30),
     breaks = seq(8, 30, 2),
     expand = c(0, 0)
   ) +
   
-  # Títulos
   labs(
-    title = "De las frecuencias a las potencias alfa y beta",
-    subtitle = paste(
-      "Densidad espectral de potencia estimada",
-      "mediante Welch · Electrodo AF3"
-    ),
+    title = NULL,
+    subtitle = "Nota: Se muestra la densidad espectral de potencia estimada mediante Welch para el electrodo AF3. Las áreas sombreadas corresponden a las bandas alfa (8–12 Hz) y beta (12–30 Hz).",
     x = "Frecuencia (Hz)",
     y = "Densidad espectral de potencia (PSD)",
-    caption = paste(
-      "Datos: GAMEEMO (Alakuş et al., 2020).",
-      "Una estimación cada 0,5 Hz.",
-      "\nLas áreas coloreadas se calculan",
-      "mediante la regla del trapecio."
-    )
+    caption = NULL
   ) +
   
-  # Estilo pastel
   theme_minimal(base_size = 13) +
   
   theme(
-    plot.title = element_text(
-      face = "bold",
-      size = 17,
-      colour = "#26354A"
-    ),
+    plot.title = element_blank(),
     
     plot.subtitle = element_text(
       size = 11,
@@ -491,12 +466,7 @@ grafico.psd <- ggplot(
       colour = "#475569"
     ),
     
-    plot.caption = element_text(
-      size = 9,
-      colour = "#8490A2",
-      hjust = 0,
-      margin = margin(t = 12)
-    ),
+    plot.caption = element_blank(),
     
     plot.margin = margin(18, 18, 15, 15)
   )

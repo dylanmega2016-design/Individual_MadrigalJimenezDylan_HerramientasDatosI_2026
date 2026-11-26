@@ -210,8 +210,13 @@ grafico.lineas.eeg <- ggplot(
     linetype = serie
   )
 ) +
-  geom_line(linewidth = 1) +
-  geom_point(size = 2) +
+  geom_line(
+    linewidth = 0.95,
+    alpha = 0.9
+  ) +
+  geom_point(
+    size = 2
+  ) +
   scale_color_manual(
     values = c(
       "Alfa - Slender" = "#C76D7A",
@@ -229,36 +234,59 @@ grafico.lineas.eeg <- ggplot(
     )
   ) +
   labs(
-    title = "Potencias EEG por participante en Slender y Goat Simulator",
-    subtitle = "Comparación individual de las bandas alfa y beta frontales",
+    title = NULL,
+    subtitle = "Nota: Las líneas comparan la potencia frontal resumida de cada participante; no representan una evolución temporal.",
     x = "Participante",
     y = "Potencia",
     color = "Serie",
     linetype = "Serie",
-    caption = "Datos: GAMEEMO (Alakuş et al., 2020)."
+    caption = NULL
   ) +
-  theme_minimal(base_size = 12) +
+  theme_minimal(base_size = 13) +
   theme(
-    plot.title = element_text(face = "bold", size = 15),
-    plot.subtitle = element_text(size = 11),
-    axis.title.y = element_text(angle = 0, vjust = 0.5),
-    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_blank(),
+    plot.subtitle = element_text(
+      size = 10.5,
+      colour = "#728097",
+      margin = margin(b = 10)
+    ),
+    axis.title.y = element_text(
+      angle = 0,
+      vjust = 0.5,
+      colour = "#475569"
+    ),
+    axis.title.x = element_text(
+      colour = "#475569"
+    ),
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1,
+      colour = "#64748B"
+    ),
+    axis.text.y = element_text(
+      colour = "#64748B"
+    ),
     panel.grid.minor = element_blank(),
+    panel.grid.major = element_line(
+      colour = "#EDF0F5",
+      linewidth = 0.4
+    ),
     legend.position = "bottom",
     legend.title = element_text(face = "bold"),
-    plot.caption = element_text(hjust = 0)
+    legend.text = element_text(colour = "#44506A"),
+    plot.caption = element_blank(),
+    plot.margin = margin(15, 18, 12, 15)
   )
 
 # Guardamos el gráfico
 ggsave(
   filename = "res/06_lineas_potencias_eeg.png",
   plot = grafico.lineas.eeg,
-  width = 12,
-  height = 6.5,
+  width = 12.5,
+  height = 6.8,
   dpi = 300,
   bg = "white"
 )
-
 # -------------------------------------------------------------------------
 # Comparación gráfica de las potencias EEG entre Slender y Goat Simulator
 # -------------------------------------------------------------------------
@@ -321,10 +349,11 @@ colores.fuertes <- c(
 )
 
 #  Construimos el gráfico
+
 grafico.eeg.g34 <- ggplot(
   datos.eeg.g34,
   aes(x = potencia, y = juego)
-  ) +
+) +
   
   # Franja suave del 50 % central
   geom_segment(
@@ -380,44 +409,58 @@ grafico.eeg.g34 <- ggplot(
     show.legend = FALSE
   ) +
   
-  # Facetas: alfa y beta
   facet_wrap(
     ~ banda,
     ncol = 1,
     scales = "free_x"
   ) +
   
-  # Escalas y colores
   scale_color_manual(values = colores.fuertes) +
   scale_fill_manual(values = colores.fuertes) +
   
-  # Etiquetas
   labs(
-    title = "Slender y Goat Simulator: comparación de potencias EEG",
-    subtitle = "Cada punto representa una sesión individual; la franja suave contiene el 50 % central y el rombo señala la mediana.",
+    title = NULL,
+    subtitle = "Nota: Cada punto representa una sesión individual; la franja suave contiene el 50 % central y el rombo señala la mediana.",
     x = "Potencia espectral",
     y = NULL,
-    caption = "Datos: GAMEEMO (Alakuş et al., 2020). 28 participantes por videojuego."
+    caption = NULL
   ) +
   
-  # Tema
   theme_minimal(base_size = 13) +
   theme(
-    plot.title = element_text(face = "bold", size = 17, colour = "#2F3B52"),
-    plot.subtitle = element_text(size = 11, colour = "#667085"),
-    strip.text = element_text(face = "bold", size = 12, colour = "#44506A"),
-    strip.background = element_rect(fill = "#F3F5FA", colour = NA),
-    axis.title.x = element_text(face = "plain", colour = "#44506A"),
-    axis.text.x = element_text(colour = "#5B657A"),
-    axis.text.y = element_text(colour = "#44506A"),
+    plot.title = element_blank(),
+    plot.subtitle = element_text(
+      size = 11,
+      colour = "#728097",
+      margin = margin(b = 10)
+    ),
+    strip.text = element_text(
+      face = "bold",
+      size = 12,
+      colour = "#44506A"
+    ),
+    strip.background = element_rect(
+      fill = "#F3F5FA",
+      colour = NA
+    ),
+    axis.title.x = element_text(
+      colour = "#44506A"
+    ),
+    axis.text.x = element_text(
+      colour = "#5B657A"
+    ),
+    axis.text.y = element_text(
+      colour = "#44506A"
+    ),
     panel.grid.minor = element_blank(),
     panel.grid.major.y = element_blank(),
-    panel.grid.major.x = element_line(colour = "#E7EAF1"),
-    plot.caption = element_text(hjust = 0, size = 9, colour = "#7A8398"),
-    plot.margin = margin(15, 80, 15, 15)
+    panel.grid.major.x = element_line(
+      colour = "#E7EAF1"
+    ),
+    plot.caption = element_blank(),
+    plot.margin = margin(10, 80, 10, 15)
   ) +
   
-  # Para que se vean las etiquetas a la derecha
   coord_cartesian(clip = "off")
 
 # Guardamos el gráfico
