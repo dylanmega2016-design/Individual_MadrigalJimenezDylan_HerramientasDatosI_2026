@@ -32,7 +32,7 @@ resumen.sam <- datos.sam |>
 
 # Comparación de valencia entre Slender (G3) y Goat Simulator (G4)
 comparacion.sam <- datos.sam |> 
-  filter(juego == "G3" | juego == "G4") |> 
+  dplyr::filter(juego == "G3" | juego == "G4") |> 
   select(participante, juego, valencia_SAM)|> 
   pivot_wider (
     names_from = juego,
@@ -50,7 +50,7 @@ resumen.comparacion <- comparacion.sam |>
 
 # Comparación de activación entre Slender (G3) y Goat Simulator (G4)
 comparacion.activacion <- datos.sam |>
-  filter(juego == "G3" | juego == "G4") |>
+  dplyr::filter(juego == "G3" | juego == "G4") |>
   select(participante, juego, activacion_SAM) |>
   pivot_wider(
     names_from = juego,
@@ -80,7 +80,7 @@ datos.grafico <- datos.sam |>
   )
 
 datos.bolitas <- datos.grafico |>
-  filter(!is.na(puntuacion)) |>
+  dplyr::filter(!is.na(puntuacion)) |>
   mutate(
     juego = factor(
       juego,
@@ -141,7 +141,7 @@ conteos.sam <- conteos.sam |>
 
 
 medianas.decimales <- medianas.sam |>
-  filter(mediana %% 1 != 0) |>
+  dplyr::filter(mediana %% 1 != 0) |>
   mutate(
     color.bolita = paste0(
       as.character(juego),
