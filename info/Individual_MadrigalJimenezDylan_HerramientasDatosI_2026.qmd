@@ -39,6 +39,8 @@ Dylan Madrigal Jiménez\par
 
 25 de noviembre de 2026\par
 
+\href{https://github.com/dylanmega2016-design/Individual_MadrigalJimenezDylan_HerramientasDatosI_2026}{Repositorio del proyecto en GitHub}\par
+
 \vspace{0.35cm}
 \hrule
 \endgroup
