@@ -78,11 +78,66 @@ Finalmente, se realizó una comparación pareada entre Slender y Goat Simulator,
 
 ### Resultados del análisis SAM
 
-Las respuestas del cuestionario SAM muestran diferencias en las experiencias emocionales reportadas durante los cuatro videojuegos. Como se observa en la Figura 1, Train Sim World y Slender presentaron las menores medianas de valencia (3 puntos), mientras que Unravel y Goat Simulator alcanzaron las mayores (7 puntos). En cuanto a la activación emocional, Train Sim World presentó la menor mediana (3), seguido de Unravel (4), Goat Simulator (6) y Slender (6,5).
+Las respuestas del cuestionario SAM muestran diferencias en las experiencias emocionales reportadas durante los cuatro videojuegos. Como se observa en la @tbl-resumen-sam, Train Sim World y Slender presentaron las menores medianas de valencia (3 puntos), mientras que Unravel y Goat Simulator alcanzaron las mayores (7 puntos). En cuanto a la activación emocional, Train Sim World presentó la menor mediana (3), seguido de Unravel (4), Goat Simulator (6) y Slender (6,5).
 
 El contraste entre Slender y Goat Simulator resulta particularmente interesante, pues ambos videojuegos presentaron medianas de activación cercanas, pero puntuaciones de valencia claramente diferenciadas. Esto permite comparar dos experiencias con niveles grupales de activación similares, aunque con distinto grado de agrado declarado.
 
-![Distribución de las puntuaciones de valencia y activación emocional. Fuente: elaboración propia con datos de GAMEEMO (Alakus et al., 2020b).](../res/01_resumen_sam_bolitas.png){#fig-sam fig-pos="H" width="85%"}
+```{r}
+#| label: tbl-resumen-sam
+#| tbl-cap: "Medianas de valencia y activación emocional por videojuego."
+#| tbl-pos: "H"
+#| echo: false
+#| message: false
+#| warning: false
+#| cache: false
+
+library(tidyverse)
+library(tinytable)
+
+# Color del encabezado
+azul <- "#34435E"
+
+# Importación y selección de los resultados SAM
+tabla.sam <- read_csv(
+  "../res/comparacion_juegos.csv",
+  show_col_types = FALSE
+) |>
+  dplyr::select(
+    nombre_videojuego,
+    mediana_valencia,
+    mediana_activacion,
+    participantes
+  ) |>
+  rename(
+    Videojuego = nombre_videojuego,
+    Valencia = mediana_valencia,
+    Activación = mediana_activacion,
+    Participantes = participantes
+  ) |>
+  mutate(
+    Activación = format(
+      Activación,
+      trim = TRUE,
+      decimal.mark = ","
+    )
+  )
+
+# Generación de la tabla
+tabla.sam |>
+  tt(
+    notes = "Fuente: elaboración propia con datos de GAMEEMO (Alakus et al., 2020b).",
+    escape = TRUE,
+    theme = "striped"
+  ) |>
+  style_tt(
+    i = 0,
+    bold = TRUE,
+    color = "white",
+    background = azul
+  ) |>
+  style_tt(j = 1, bold = TRUE) |>
+  style_tt(j = 2:4, align = "r")
+```
 
 Al comparar las respuestas individuales, 27 de los 28 participantes reportaron una mayor valencia en Goat Simulator y uno presentó la misma puntuación en ambos videojuegos. La mediana de las diferencias fue de 4 puntos. Respecto a la activación emocional, 15 participantes reportaron una mayor activación en Slender, 10 en Goat Simulator y 3 presentaron puntuaciones iguales, con una mediana de las diferencias de −1 punto (G4 − G3).
 
@@ -92,15 +147,15 @@ Al comparar las respuestas individuales, 27 de los 28 participantes reportaron u
 
 En los cuatro videojuegos, las medianas grupales de potencia alfa oscilaron entre 7,56 y 8,87, mientras que las correspondientes a la banda beta se situaron entre 17,9 y 20,2.
 
-Como se observa en la Figura 2, Slender y Goat Simulator presentaron distribuciones de potencia EEG frontal con una considerable superposición. La mediana de potencia alfa fue ligeramente superior en Goat Simulator (8,11 frente a 7,68), mientras que la mediana de potencia beta fue mayor en Slender (20,2 frente a 19,4).
+Como se observa en la Figura 1, Slender y Goat Simulator presentaron distribuciones de potencia EEG frontal con una considerable superposición. La mediana de potencia alfa fue ligeramente superior en Goat Simulator (8,11 frente a 7,68), mientras que la mediana de potencia beta fue mayor en Slender (20,2 frente a 19,4).
 
-Cada punto de la Figura 2 representa la potencia espectral resumida de un participante, mientras que la franja coloreada contiene el 50 % central de los datos y el rombo señala la mediana grupal. La superposición de las distribuciones y la dispersión de las observaciones evidencian que las potencias espectrales no presentan una separación visual tan marcada como las puntuaciones de valencia del cuestionario SAM, sino que muestran una cercanía grupal semejante a la observada en la activación emocional.
+Cada punto de la Figura 1 representa la potencia espectral resumida de un participante, mientras que la franja coloreada contiene el 50 % central de los datos y el rombo señala la mediana grupal. La superposición de las distribuciones y la dispersión de las observaciones evidencian que las potencias espectrales no presentan una separación visual tan marcada como las puntuaciones de valencia del cuestionario SAM, sino que muestran una cercanía grupal semejante a la observada en la activación emocional.
 
 ![Distribución de las potencias alfa y beta frontales en Slender y Goat Simulator. Fuente: elaboración propia con datos de GAMEEMO (Alakus et al., 2020b).](../res/05_eeg_slender_vs_goat.png){#fig-eeg fig-pos="H" width="85%"}
 
 ### Comparación individual de las potencias EEG
 
-Como se observa en la Figura 3, las potencias espectrales presentan variaciones importantes entre participantes. En particular, se identifican participantes con valores elevados de potencia beta en ambos videojuegos, mientras que otros presentan valores considerablemente menores. Este comportamiento sugiere que parte de la variabilidad observada se relaciona con diferencias individuales que se manifiestan durante ambas experiencias.
+Como se observa en la Figura 2, las potencias espectrales presentan variaciones importantes entre participantes. En particular, se identifican participantes con valores elevados de potencia beta en ambos videojuegos, mientras que otros presentan valores considerablemente menores. Este comportamiento sugiere que parte de la variabilidad observada se relaciona con diferencias individuales que se manifiestan durante ambas experiencias.
 
 ![Comparación individual de las potencias alfa y beta frontales en Slender y Goat Simulator. Fuente: elaboración propia con datos de GAMEEMO (Alakus et al., 2020b).](../res/06_lineas_potencias_eeg.png){#fig-eeg-individual fig-pos="H" width="80%"}
 
@@ -188,7 +243,7 @@ and clinical neurology.
 
 Las siguientes figuras se incluyen exclusivamente como material ilustrativo del procedimiento metodológico descrito en el informe. Su propósito es visualizar la estructura de las señales EEG, la segmentación temporal y la estimación de la densidad espectral de potencia mediante el método de Welch.
 
-La Figura 4 muestra el comportamiento de las señales EEG preprocesadas durante el primer minuto de una sesión de juego, antes de aplicar el análisis espectral.
+La Figura 3 muestra el comportamiento de las señales EEG preprocesadas durante el primer minuto de una sesión de juego, antes de aplicar el análisis espectral.
 
 ![Señales EEG preprocesadas durante un minuto de medición. Fuente: elaboración propia con datos de GAMEEMO (Alakus et al., 2020b).](../res/02_eeg_preprocesado_1_minuto.png){#fig-anexo-a fig-pos="H" width="100%"}
 
@@ -196,7 +251,7 @@ La Figura 4 muestra el comportamiento de las señales EEG preprocesadas durante 
 
 ### Anexo B. Segmento de dos segundos de las señales EEG
 
-La Figura 5 muestra un segmento de 256 muestras consecutivas, equivalente a dos segundos de medición a una frecuencia de muestreo de 128 Hz. Esta duración corresponde a la longitud de los segmentos utilizados en el método de Welch.
+La Figura 4 muestra un segmento de 256 muestras consecutivas, equivalente a dos segundos de medición a una frecuencia de muestreo de 128 Hz. Esta duración corresponde a la longitud de los segmentos utilizados en el método de Welch.
 
 ![Segmento de dos segundos de las señales EEG preprocesadas. Fuente: elaboración propia con datos de GAMEEMO (Alakus et al., 2020b).](../res/03_eeg_preprocesado_2_segundos.png){#fig-anexo-b fig-pos="H" width="100%"}
 
@@ -204,6 +259,6 @@ La Figura 5 muestra un segmento de 256 muestras consecutivas, equivalente a dos 
 
 ### Anexo C. Estimación de la densidad espectral de potencia
 
-La Figura 6 muestra la densidad espectral de potencia del electrodo AF3, estimada mediante el método de Welch. Las regiones correspondientes a las bandas alfa (8–12 Hz) y beta (12–30 Hz) permiten visualizar los intervalos sobre los cuales se aplicó la regla del trapecio para obtener las respectivas potencias espectrales.
+La Figura 5 muestra la densidad espectral de potencia del electrodo AF3, estimada mediante el método de Welch. Las regiones correspondientes a las bandas alfa (8–12 Hz) y beta (12–30 Hz) permiten visualizar los intervalos sobre los cuales se aplicó la regla del trapecio para obtener las respectivas potencias espectrales.
 
 ![Densidad espectral de potencia del electrodo AF3 mediante el método de Welch. Fuente: elaboración propia con datos de GAMEEMO (Alakus et al., 2020b).](../res/04_espectro_welch_AF3.png){#fig-anexo-c fig-pos="H" width="100%"}
