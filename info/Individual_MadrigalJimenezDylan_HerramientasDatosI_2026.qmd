@@ -262,3 +262,11 @@ La Figura 4 muestra un segmento de 256 muestras consecutivas, equivalente a dos 
 La Figura 5 muestra la densidad espectral de potencia del electrodo AF3, estimada mediante el método de Welch. Las regiones correspondientes a las bandas alfa (8–12 Hz) y beta (12–30 Hz) permiten visualizar los intervalos sobre los cuales se aplicó la regla del trapecio para obtener las respectivas potencias espectrales.
 
 ![Densidad espectral de potencia del electrodo AF3 mediante el método de Welch. Fuente: elaboración propia con datos de GAMEEMO (Alakus et al., 2020b).](../res/04_espectro_welch_AF3.png){#fig-anexo-c fig-pos="H" width="100%"}
+
+\newpage
+
+### Anexo D. Uso de inteligencia artificial
+
+Durante el desarrollo de este proyecto se utilizó ChatGPT, herramienta de inteligencia artificial desarrollada por OpenAI, como recurso de apoyo para la revisión y corrección del código en R, la elaboración y el diseño de visualizaciones estadísticas y la revisión de la redacción del informe.
+
+El uso de esta herramienta se realizó bajo la supervisión y el criterio de Dylan Madrigal Jiménez, quien estuvo a cargo de las decisiones metodológicas, la ejecución del código, la comprobación de los resultados estadísticos y la interpretación de los hallazgos.
